@@ -1,0 +1,58 @@
+/* 
+
+	 1) Rose, Lily, Frank and Harry are four members of a famous company.
+     They occupy different positions within the company: an intern, a manager, a director, and a CEO.
+     Each of them reports to the its immediate superior, i.e. the intern reports to the manager, the manager
+     reports to the director, and the director reports to the CEO. Each of them sits on a different
+     floor of a skyscraper: three, five, nine and twelve. We can use the following constants
+     Rose, Lily, Frank, Harry, 3, 5, 9, 12, intern, manager, director, CEO
+     functions
+			Floor(x); Position(x);
+	 and predicate
+			ReportsTo(x; y)
+	 meaning that x reports to y. We know the following facts about them.
+
+	 2) ReportsTo(x; y) and Floor(y) = 3 >> ReportsTo(Rose; x)
+	 3) Position(Frank) = manager
+	 4) ReportsTo(x; y) and Floor(x) = 12 >> Floor(y) = 3
+	 5) Floor(Harry) = 9
+	 6) ReportsTo(Frank; Lily)
+	 7) Floor(x) = 3 >> ReportsTo(x;Harry)
+	 8) ReportsTo(x; Lily) >> Floor(x) = 12
+	 9) Position(x) = Manager and ReportsTo(x,y) >> Position(y)=Director
+	10) Position(x) = Manager and ReportsTo(y; x) >> Position(y) = Intern
+	11) Position(x) = Director and ReportsTo(x; y) >> Position(y) = CEO
+	12) Floor(Rose) = 5
+
+*/
+
+% Render the employees term as a nice table.
+:- use_rendering(table,
+		 [header(person('name', 'position', 'floor'))]).
+
+reportsTo(X,Y,Ls):-
+	member(X,Ls),
+	member(Y,Ls),
+	((X = person(_,intern,_),Y = person(_,manager,_));
+	(X = person(_,manager,_),Y = person(_,director,_));
+	(X = person(_,director,_),Y = person(_,ceo,_))).
+
+company(Com) :-
+	% each person in the list Com of company is represented as:
+	%      person(name; position; floor).
+	length(Com,4),                                           %  1
+	reportsTo(person(rose,_,_),person(_,_,_),Com),     %  2.1
+    reportsTo(person(_,_,_),person(_,_,3),Com),                 %  2.2	  
+    member(person(frank,manager,_),Com),					%3
+	reportsTo(person(_,_,12),person(_,_,3),Com),                        %  4
+	member(person(harry,_,9),Com),                       %  5
+	reportsTo(person(frank,_,_),person(lily,_,_),Com),             %  6
+	reportsTo(person(_,_,3),person(harry,_,_),Com),                       %  7
+	reportsTo(person(_,_,12),person(lily,_,_),Com),                         %  8
+	reportsTo(person(_,manager,_),person(_,director,_),Com),      %  9
+	reportsTo(person(_,intern,_),person(_,manager,_),Com),            % 10
+	reportsTo(person(_,director,_),person(_,ceo,_),Com),        % 11
+	member(person(rose,_,5),Com).              % 12
+
+
+
